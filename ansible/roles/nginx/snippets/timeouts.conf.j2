@@ -1,0 +1,5 @@
+client_max_body_size {{ lookup('env', 'DEFAULT_MAX_BODY_SIZE') }};
+
+proxy_connect_timeout {{ lookup('env', 'DEFAULT_PROXY_CONNECT_TIMEOUT') }};
+proxy_send_timeout {{ lookup('env', 'DEFAULT_PROXY_SEND_TIMEOUT') }};
+proxy_read_timeout {{ lookup('env', 'DEFAULT_PROXY_READ_TIMEOUT') }};

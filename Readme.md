@@ -45,3 +45,4 @@ This repo will be contains:
 - `Makefile` - makefile to run common commands like build, clean, etc.
   - `make init` - to initialize the project (copy pre-push hook)
   - `make bump-version` - to bump version based on git tag
+- `local` - only for development purposes, contains local configuration files for nginx with docker

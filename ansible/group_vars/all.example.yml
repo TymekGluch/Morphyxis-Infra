@@ -1,0 +1,2 @@
+mail_service_port: 9021
+mail_service_domain: mail.example.com
