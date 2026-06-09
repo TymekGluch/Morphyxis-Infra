@@ -1,0 +1,11 @@
+*.key
+*.pem
+*.p12
+*.csr
+*.srl
+*.crt
+.env
+.env.*
+terraform.tfvars
+*.vault
+*/group_vars/all.yml

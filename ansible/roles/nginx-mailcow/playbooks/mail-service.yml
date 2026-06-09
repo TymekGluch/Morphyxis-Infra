@@ -1,0 +1,55 @@
+---
+- name: mail-service nginx config
+  become: true
+  hosts: mail-service
+
+  vars:
+    path: ansible/roles/nginx-mailcow
+
+  vars_files:
+    - ansible/group_vars/all.yml
+
+  tasks:
+    - name: Render mutual TLS config
+      copy:
+        src: "{{ path }}/snippets/mailcow-mtls.conf"
+        dest: /opt/mailcow-dockerized/data/conf/nginx/mtls.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload mailcow nginx
+
+    - name: Copy CA certificate
+      copy:
+        src: "{{ path }}/certs/ca.crt"
+        dest: /opt/mailcow-dockerized/data/conf/nginx/client-ca.crt
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload mailcow nginx
+
+    - name: Render request limits config
+      template:
+        src: "{{ path }}/templates/limits.conf.j2"
+        dest: /opt/mailcow-dockerized/data/conf/nginx/limits.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload mailcow nginx
+
+    - name: Render nginx config
+      template:
+        src: "{{ path }}/templates/mail-service.conf.j2"
+        dest: /opt/mailcow-dockerized/data/conf/nginx/site.mail-service.custom
+        owner: root
+
+        group: root
+        mode: "0644"
+      notify: reload mailcow nginx
+
+  handlers:
+    - name: reload mailcow nginx
+      shell: |
+        docker exec mailcowdockerized-nginx-mailcow-1 nginx -t
+        docker exec mailcowdockerized-nginx-mailcow-1 nginx -s reload
+      changed_when: true
