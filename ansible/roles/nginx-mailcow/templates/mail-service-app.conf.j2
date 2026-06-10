@@ -1,0 +1,17 @@
+server {
+    listen 443 ssl;
+    http2 on;
+
+    server_name {{ MAIL_SERVICE_DOMAIN }};
+
+    ssl_certificate     /opt/mailcow-dockerized/data/assets/ssl/cert.pem;
+    ssl_certificate_key /opt/mailcow-dockerized/data/assets/ssl/key.pem;
+
+    include /etc/nginx/snippets/mtls.conf;
+
+    location / {
+        proxy_pass http://127.0.0.1:{{ MAIL_SERVICE_PORT }};
+
+        include /etc/nginx/snippets/proxy-common.conf;
+    }
+}

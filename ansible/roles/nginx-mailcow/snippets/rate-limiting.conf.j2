@@ -1,0 +1,2 @@
+limit_req_zone $binary_remote_addr zone={{ NGINX_RATE_LIMIT_ZONE_NAME }}:{{ NGINX_RATE_LIMIT_ZONE_SIZE }} rate={{ NGINX_RATE_LIMIT_RATE }};
+limit_conn_zone $binary_remote_addr zone={{ NGINX_CONN_LIMIT_ZONE_NAME }}:{{ NGINX_CONN_LIMIT_ZONE_SIZE }};

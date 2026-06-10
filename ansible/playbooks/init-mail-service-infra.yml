@@ -1,0 +1,113 @@
+---
+- name: mail-service nginx config
+  hosts: mailService
+  become: true
+
+  vars:
+    rootPath: ../..
+  vars_files:
+    - ../group_vars/all.yml
+
+  tasks:
+    - name: Render mutual TLS snippet
+      copy:
+        src: "{{ rootPath }}/nginx/snippets/mailcow-mtls.conf"
+        dest: /etc/nginx/snippets/mtls.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload nginx
+
+    - name: Render proxy common snippet
+      copy:
+        src: "{{ rootPath }}/nginx/snippets/proxy-common.conf"
+        dest: /etc/nginx/snippets/proxy-common.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload nginx
+
+    - name: Render ssl config
+      copy:
+        src: "{{ rootPath }}/nginx/snippets/ssl.conf"
+        dest: /etc/nginx/conf.d/ssl.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload nginx
+
+    - name: Render request limits config
+      template:
+        src: "../roles/nginx-mailcow/snippets/limits.conf.j2"
+        dest: /etc/nginx/conf.d/limits.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload nginx
+
+    - name: Render rate limiting config
+      template:
+        src: "../roles/nginx-mailcow/snippets/rate-limiting.conf.j2"
+        dest: /etc/nginx/conf.d/rate-limiting.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload nginx
+
+    - name: Create nginx certs directory
+      file:
+        path: /etc/nginx/certs
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Copy CA certificate
+      copy:
+        src: "../roles/nginx-mailcow/certs/ca.crt"
+        dest: /etc/nginx/certs/ca.crt
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload nginx
+
+    - name: Render mailcow-service overridden nginx config
+      template:
+        src: "../roles/nginx-mailcow/templates/mailcow.conf.j2"
+        dest: /etc/nginx/sites-available/mailcow.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload nginx
+
+    - name: Render nginx config
+      template:
+        src: "../roles/nginx-mailcow/templates/mail-service-app.conf.j2"
+        dest: /etc/nginx/sites-available/mail-api.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload nginx
+
+    - name: Enable nginx configs
+      file:
+        src: /etc/nginx/sites-available/{{ item }}
+        dest: /etc/nginx/sites-enabled/{{ item }}
+        state: link
+        force: true
+      loop:
+        - mailcow.conf
+        - mail-api.conf
+      notify: reload nginx
+
+  handlers:
+    - name: validate nginx
+      command: nginx -t
+      changed_when: false
+      listen: reload nginx
+
+    - name: reload nginx service
+      service:
+        name: nginx
+        state: reloaded
+      listen: reload nginx
