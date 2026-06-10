@@ -1,0 +1,42 @@
+---
+- name: Deploy Mail Service App
+  hosts: mailService
+
+  vars_files:
+    - ../group_vars/all.yml
+
+  tasks:
+    - name: Pull image
+      community.docker.docker_image:
+        name: "{{ MAIL_SERVICE_IMAGE }}"
+        tag: "{{ MAIL_SERVICE_VERSION }}"
+        source: pull
+
+    - name: Run mail service
+      community.docker.docker_container:
+        name: mail-service
+        image: "{{ MAIL_SERVICE_IMAGE }}:{{ MAIL_SERVICE_VERSION }}"
+        state: started
+        restart_policy: unless-stopped
+
+        networks:
+          - name: mailcowdockerized_mailcow-network
+
+        env:
+          MAILCOW_SMTP_HOST: "{{ MAILCOW_SMTP_HOST }}"
+          MAILCOW_SMTP_PORT: "{{ MAILCOW_SMTP_PORT }}"
+          MAILCOW_USER: "{{ MAILCOW_USER }}"
+          MAILCOW_MAILBOX_PASSWORD: "{{ MAILCOW_MAILBOX_PASSWORD }}"
+          PORT: "{{ MAIL_SERVICE_PORT }}"
+
+      notify: check mail service container health
+
+  handlers:
+    - name: check mail service container health
+      shell: |
+        docker logs mail-service --tail 50 | grep "Morphyxis-mail-service is running"
+      ignore_errors: true
+      register: health_check
+      retries: 3
+      delay: 15
+      until: health_check.rc == 0

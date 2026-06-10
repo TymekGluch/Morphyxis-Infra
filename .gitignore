@@ -8,4 +8,5 @@
 .env.*
 terraform.tfvars
 *.vault
+valut.yml
 */group_vars/all.yml

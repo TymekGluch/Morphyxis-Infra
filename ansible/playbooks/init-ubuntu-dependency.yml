@@ -1,0 +1,23 @@
+---
+
+- name: Initialize Ubuntu Server
+  hosts: mailService
+  become: true
+
+  tasks:
+    - name: Update apt dependencies and install Docker dependencies
+      apt:
+        name: 
+          - python3
+          - python3-pip
+          - python3-docker
+        update_cache: yes
+        state: present
+
+    - name: Install apt certbot dependencies
+      apt:
+        name: 
+          - certbot
+          - python3-certbot-nginx
+        update_cache: yes
+        state: present
