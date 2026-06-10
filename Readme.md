@@ -1,10 +1,11 @@
 # Morphyxis-infra
 
-Infra repository for Morphyxis apps
+Infra repository for Morphyxis apps 
 
 This repo contains:
 
 - nginx config for server with Mailbox and applications for it
+- ansible deployment playbook 
 
 This repo will be contains:
 
