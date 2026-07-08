@@ -19,6 +19,9 @@
         state: started
         restart_policy: unless-stopped
 
+        published_ports:
+          - "127.0.0.1:{{ MAIL_SERVICE_PORT }}:{{ MAIL_SERVICE_PORT }}"
+
         networks:
           - name: mailcowdockerized_mailcow-network
 
@@ -27,6 +30,7 @@
           MAILCOW_SMTP_PORT: "{{ MAILCOW_SMTP_PORT }}"
           MAILCOW_USER: "{{ MAILCOW_USER }}"
           MAILCOW_MAILBOX_PASSWORD: "{{ MAILCOW_MAILBOX_PASSWORD }}"
+          MORPHYXIS_MAIL_SERVICE_PORT: "{{ MAIL_SERVICE_PORT }}"
           PORT: "{{ MAIL_SERVICE_PORT }}"
 
       notify: check mail service container health
