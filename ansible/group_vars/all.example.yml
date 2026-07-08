@@ -1,5 +1,8 @@
 MAIL_SERVICE_PORT: 9021
-MAIL_SERVICE_DOMAIN: mail.example.com
+
+# Internal Docker DNS name of Mailcow Postfix service.
+# Do not use the public domain here.
+MAIL_SERVICE_DOMAIN: postfix-mailcow
 
 DEFAULT_MAX_BODY_SIZE: 50M
 DEFAULT_PROXY_CONNECT_TIMEOUT: 200s
